@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mariadb = require('mariadb');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const port = 3000;
@@ -10,11 +11,36 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const pool = mariadb.createPool({
-    host: '',
+    host: '127.0.0.1',
     user: '',
     password: '',
     database: 'family_board',
     connectionLimit: 5
+});
+
+// Route to handle login requests
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query('SELECT * FROM users WHERE username = ?', [email]);
+        if (rows.length > 0) {
+            const user = rows[0];
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (isMatch) {
+                res.json({ message: 'Login successful', user: { id: user.id, username: user.username } });
+            } else {
+                res.status(401).json({ message: 'Invalid password' });
+            }
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (err) {
+        res.status(500).send(err.toString());
+    } finally {
+        if (conn) conn.release();
+    }
 });
 
 app.get('/tasks', async (req, res) => {
