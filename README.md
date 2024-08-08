@@ -1,13 +1,12 @@
 
 # Beecham Family Application
 
-The Beecham Family Software Application is a web-based platform designed to help the Beecham family manage tasks, events, and shared notes.
-It provides a user interface for creating, viewing, and editing scheduled events. The software application has been created using Node.js, Express, and MariaDB, with Tailwind CSS for styling.
+This application is a web-based platform designed to help people manage tasks, events, and shared notes.
 
 ## Table of Contents
 
-- [Features](#features)
 - [Installation](#installation)
+- [Setting Up MariaDB](#setting-up-mariadb)
 - [Usage](#usage)
 - [Endpoints](#endpoints)
 - [File Structure](#file-structure)
@@ -15,16 +14,9 @@ It provides a user interface for creating, viewing, and editing scheduled events
 - [Contributing](#contributing)
 - [License](#license)
 
-## Features
-
-- User Authentication: Secure login using bcrypt for password hashing.
-- Task Management: Create, view, and edit tasks, events, notes, notifications, reminders, and smart device entries.
-- Responsive Design: User interface styled with Tailwind CSS for a responsive and modern look.
-- RESTful API: API endpoints for managing tasks.
-
 ## Installation
 
-To run the Beecham Family Application locally, follow these steps:
+To run locally, follow:
 
 1. **Clone the repository:**
 
@@ -59,6 +51,48 @@ To run the Beecham Family Application locally, follow these steps:
 
    The server runs at `http://localhost:3000`.
 
+
+## Setting Up MariaDB
+
+To set up MariaDB follow:
+
+1. **Install MariaDB:**
+
+   - **On Ubuntu:**
+     ```bash
+     sudo apt update
+     sudo apt install mariadb-server
+     ```
+
+   - **On Windows:**
+     Download the installer from the [MariaDB website](https://mariadb.org/download/) and follow the installation instructions.
+
+2. **Secure the MariaDB installation:**
+   ```bash
+   sudo mysql_secure_installation
+   ```
+
+   Follow the prompts to set up the root password and remove anonymous users.
+
+3. **Create a database and user for the application:**
+   ```bash
+   sudo mysql -u root -p
+   CREATE DATABASE family_board;
+   CREATE USER 'yourusername'@'localhost' IDENTIFIED BY 'yourpassword';
+   GRANT ALL PRIVILEGES ON family_board.* TO 'yourusername'@'localhost';
+   FLUSH PRIVILEGES;
+   EXIT;
+   ```
+
+4. **Import the database schema:**
+   Ensure you have a SQL file (`schema.sql`) with the required database structure. Run the following command to import it:
+   ```bash
+   mysql -u yourusername -p family_board < path/to/schema.sql
+   ```
+
+5. **Update the database configuration in your application:**
+   Modify the `server.js` and `create_users.js` files with your MariaDB credentials.
+
 ## Usage
 
 ### Login
@@ -67,7 +101,7 @@ Navigate to `http://localhost:3000/login.html` to access the login page. Enter y
 
 ### Main Interface
 
-After logging in, you will be directed to the main interface (`main.html`). Here, you can view the list of entries, create new entries, and manage existing ones.
+After logging in, you will be directed to (`main.html`). Here, you can view the list of entries, create new entries, and manage existing ones.
 
 ## Endpoints
 
