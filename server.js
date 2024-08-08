@@ -106,3 +106,20 @@ app.put('/tasks/:id', async (req, res) => {
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
+
+
+// Route to check for due tasks/events
+app.get('/due-tasks', async (req, res) => {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const now = new Date();
+        const query = 'SELECT * FROM tasks WHERE created_at <= ?';
+        const rows = await conn.query(query, [now]);
+        res.json(rows);
+    } catch (err) {
+        res.status(500).send(err.toString());
+    } finally {
+        if (conn) conn.release();
+    }
+});

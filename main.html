@@ -132,6 +132,17 @@
         </div>
     </div>
 
+	<!-- Modal for Reminders -->
+	<div id="reminderModal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
+		<div class="bg-card p-6 rounded-lg shadow-md w-full max-w-md">
+			<h2 class="text-xl font-bold text-foreground mb-4">Reminder</h2>
+			<p id="reminderMessage" class="text-muted-foreground mb-4"></p>
+			<div class="flex justify-end">
+				<button type="button" id="closeReminderBtn" class="bg-secondary text-secondary-foreground px-4 py-2 rounded-lg hover:bg-secondary/80 transition">Close</button>
+			</div>
+		</div>
+	</div>
+
     <!-- Modal for New Task -->
     <div id="newTaskModal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
         <div class="bg-card p-6 rounded-lg shadow-md w-full max-w-md">
@@ -220,6 +231,39 @@
     </div>
 
 	<script>
+		async function checkForDueTasks() {
+			try {
+				const response = await fetch('http://localhost:3000/due-tasks');
+				const dueTasks = await response.json();
+
+				if (dueTasks.length > 0) {
+					showReminder(dueTasks);
+				}
+			} catch (error) {
+				console.error('Error checking for due tasks:', error);
+			}
+		}
+
+		function showReminder(tasks) {
+			const reminderModal = document.getElementById('reminderModal');
+			const reminderMessage = document.getElementById('reminderMessage');
+
+			const taskMessages = tasks.map(task => `${task.type}: ${task.title}`).join('<br>');
+			reminderMessage.innerHTML = taskMessages;
+
+			reminderModal.classList.remove('hidden');
+		}
+
+		document.getElementById('closeReminderBtn').addEventListener('click', () => {
+			document.getElementById('reminderModal').classList.add('hidden');
+		});
+
+		// Check for due tasks every minute
+		setInterval(checkForDueTasks, 60000);
+
+		// Initial check for due tasks
+		checkForDueTasks();
+		
 		async function loadTasks() {
 			try {
 				const response = await fetch('http://localhost:3000/tasks');
