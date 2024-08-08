@@ -1,5 +1,5 @@
 
-# Beecham Family Application
+# 6CC550-CW2 Application
 
 This application is a web-based platform designed to help people manage tasks, events, and shared notes.
 
